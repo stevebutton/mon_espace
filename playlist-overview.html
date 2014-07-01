@@ -1,0 +1,112 @@
+﻿<div class="item full single-portfolio">
+    <div style="height:700px !important;">
+        <div class="portfolio-controls">
+            <a href="#" id="portfolio-prev">
+                <i class="fa fa-arrow-left"></i>
+            </a>
+            <a href="#" id="portfolio-close">
+                <i class="fa fa-times"></i>
+            </a>
+            <a href="#" id="portfolio-next">
+                <i class="fa fa-arrow-right"></i>
+            </a>
+        </div>
+            <ul id="categories">
+                <li data-tagid="1">
+                    Energy Boost
+                </li>
+                <li data-tagid="2">
+                    My customised sessions
+                </li>
+                <li data-tagid="3">
+                    Relieve back pain
+                </li>
+                <li data-tagid="4">
+                    Boost energy
+                </li>
+            </ul>
+            <select id="length-filter">
+                <option value="0" selected>All</option>
+                <option value="15">Short</option>
+                <option value="30">Medium</option>
+                <option value="60">Long</option>
+            </select>
+            <div id="playlists">
+
+            </div>
+    </div>
+</div>
+<script id="playlist-template" type="text/x-handlebars-template">
+    {{#each .}}
+    <div data-length="{{time}}" class="playlist">
+        <h2>{{time}}</h2>
+        <p>
+            <a href="view-playlist.html?tid={{../currentTagId}}&pid={{id}}&iframe=true&width=100%&height=100%" rel="prettyPhoto">
+                {{#each units}}
+                {{#unless transition}}
+                {{#if thumbnails.small}}
+                <img src="{{thumbnails.small}}" />
+                {{/if}}
+                {{/unless}}
+                {{/each}}
+            </a>
+        </p>
+    </div>
+
+    {{/each}}
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('#categories li').click(function () {
+            $('#playlists').html('');
+            $('#length-filter').val('0');
+            var tagId = $(this).data('tagid');
+            $.ajax({
+                url: "https://vyt.aidn.fr/SimpleSeances/find?wp_id=710&time_slot_id=8&tag_id=" + tagId,
+                data: null,
+                success: function (data, textStatus) {
+                    if (textStatus == "success") {
+                        var source;
+                        var template;
+                        var html;
+                        source = $("#playlist-template").html();
+                        template = window.Handlebars.compile(source);
+                        data.currentTagId = tagId;
+                        html = template(data);
+                        $('#playlists').html(html);
+                        $("a[rel^='prettyPhoto']").prettyPhoto({ deeplinking: false });
+                    }
+                }
+            });
+        });
+        $('#length-filter').change(function () {
+            var filter = $(this).val();
+            $('.playlist').each(function () {
+                // Get duration in minutes
+                var timeArray = $(this).data('length').split(':');
+                var minutes = parseInt(timeArray[0]) * 60 + parseInt(timeArray[1]);
+                var hide = false;
+                if (filter == 15) {
+                    if (minutes > 15) {
+                        hide = true;
+                    }
+                } else if (filter == 30) {
+                    if (minutes < 15 || minutes > 30) {
+                        hide = true;
+                    }
+                }
+                else if (filter == 60) {
+                    if (minutes < 60) {
+                        hide = true;
+                    }
+                }
+                if (hide) {
+                    $(this).hide('slow');
+                } else if ($(this).is(":visible") == false) {
+                    $(this).show('slow');
+                }
+            });
+        });
+    });
+</script>
