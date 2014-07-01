@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title></title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1" />
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0-rc.1/jquery.mobile-1.4.0-rc.1.min.css">
+        <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.4.0-rc.1/jquery.mobile-1.4.0-rc.1.min.js"></script>
+        <script src="http://a.vimeocdn.com/js/froogaloop2.min.js"></script>
+        <style>
+            #container {
+                text-align: center;
+            }
+        </style>
+    </head>
+<body>
+    <div data-role="page" id="home">
+        <div data-role="header">
+            <h1>energie</h1>
+        </div>
+        <div data-role="content">
+            <div id="container" style="height:600px;display:none;">
+            </div>
+            <div>
+                <ul data-role="listview" data-inset="true" id="playList"></ul>
+            </div>
+        </div>
+        <div data-role="footer">
+        </div>
+    </div>
+    <script type="text/javascript">
+        var playlist;
+        var currentVideoIndex = 0;
+        $(document).on("pageshow", "#home", function (event) {
+            var tagId = getParameterByName("tid", 0);
+            var playListId = getParameterByName("pid", 0);
+            $.mobile.loading('show');
+            var url = "https://vyt.aidn.fr/SimpleSeances/find?wp_id=710&time_slot_id=8&tag_id=" + tagId;
+            $.getJSON(url, function (seances) {
+                var list = [];
+                for (var i = 0; i < seances.length; i++) {
+                    if (seances[i].id == playListId) {
+                        playlist = seances[i];
+                    }
+                }
+                playVideo(currentVideoIndex);
+                $("#container").show('slow');
+                for (var i = 0; i < playlist.units.length; i++) {
+                    var unit = playlist.units[i];
+                    if (!unit.transition) {
+                        var line = '<li><a href="javascript:playVideo(' + i + ')"> ';
+                        if (!!unit.thumbnails) {
+                            line += '<img src="' + unit.thumbnails.small + '"> ';
+                        }
+                        line += '<h2>' + unit.title + '</h2> <p>(' + unit.description + ')</p></a> </li>';
+                        list.push(line);
+                    }
+                }
+                $("#playList").append(list.join('')).listview('refresh');
+                $.mobile.loading('hide');
+            });
+        });
+        function playVideo(index) {
+            scroll(0, 0);
+            currentVideoIndex = index;
+            var unit = playlist.units[index];
+            $("#container").html('<iframe src="//player.vimeo.com/video/' + unit.vimeoid + '?api=1&title=0&byline=0&portrait=0&autoplay=1" width="90%" height="70%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> <h2>' + unit.title + '</h2> <p>(' + unit.description + ')</p>').trigger("create");
+            var iframe = $('#container iframe')[0], player = $f(iframe);
+
+            player.addEvent('ready', function () {
+                player.addEvent('play', videoStart);
+                player.addEvent('finish', videoComplete);
+            });
+        }
+        function videoStart(id) {
+        }
+        function videoComplete(id) {
+            currentVideoIndex++;
+            if (currentVideoIndex <= playlist.units.length) {
+                playVideo(currentVideoIndex);
+            }
+        }
+        function getParameterByName(name, defaultValue) {
+            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                results = regex.exec(location.search);
+            return results == null ? defaultValue : decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+    </script>
+</body>
+</html>
