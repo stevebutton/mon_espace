@@ -63,8 +63,7 @@ jQuery(document).ready(function($){
 	/**
 	 * AJAX Portfolio
 	 */
-	jQuery('#container a').click(function(){
-		
+	jQuery('#container a').click(function() {
 		$(this).attr('data-ajax-active', 'true');
 		
 		var url = $(this).attr('href');
