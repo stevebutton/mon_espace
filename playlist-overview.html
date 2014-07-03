@@ -1,19 +1,22 @@
 ﻿<style type="text/css">
     #categories {
-        list-style-type: none;
+    text-decoration: none;
     }
     #categories li {
-        float: left;
         padding-right: 10px;
-        text-decoration: underline;
+        list-style-type: none;
+        display: inline;
+        cursor: pointer;
+    }
+    #categories li a {
+        text-decoration: none;
     }
     #playlists {
         clear: both;
         width: 90%;
-        margin: auto;
     }
     #filter {
-        float: right;
+        text-align: center;
     }
 </style>
 <div id="playlist-container" class="item full single-portfolio">
@@ -29,19 +32,19 @@
                 <i class="fa fa-arrow-right"></i>
             </a>
         </div>
-        <div style="margin:auto;width:530px;">
-            <ul id="categories">
+        <div style="text-align:center;">
+            <ul id="categories" >
                 <li data-tagid="1">
-                    Energy Boost
+                    <img src="img/monespacebt2.jpg" />
                 </li>
                 <li data-tagid="2">
-                    My Customised Sessions
+                    <img src="img/monespacebt4.jpg" />
                 </li>
                 <li data-tagid="3">
-                    Relieve Back Pain
+                    <img src="img/monespacebt3.jpg" />
                 </li>
                 <li data-tagid="4">
-                    Boost Energy
+                    <img src="img/monespacebt1.jpg" />
                 </li>
             </ul>
             
@@ -99,7 +102,7 @@
                             data.currentTagId = tagId;
                             html = template(data);
                             $('#playlists').html(html);
-                            $("a[rel^='prettyPhoto']").prettyPhoto({ deeplinking: false });
+                            $("a[rel^='prettyPhoto']").prettyPhoto({ deeplinking: false});
                             //resize parent loader container
                             var height = $("#playlist-container").height();
                             $("#loader").height(height + 20);
