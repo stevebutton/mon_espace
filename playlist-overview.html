@@ -1,20 +1,24 @@
 ﻿<style type="text/css">
     #categories {
-    text-decoration: none;
-    }
-    #categories li {
-        padding-right: 10px;
-        list-style-type: none;
-        display: inline;
-        cursor: pointer;
-    }
-    #categories li a {
         text-decoration: none;
     }
+
+        #categories li {
+            padding-right: 10px;
+            list-style-type: none;
+            display: inline;
+            cursor: pointer;
+        }
+
+            #categories li a {
+                text-decoration: none;
+            }
+
     #playlists {
         clear: both;
         width: 90%;
     }
+
     #filter {
         text-align: center;
     }
@@ -33,7 +37,7 @@
             </a>
         </div>
         <div style="text-align:center;">
-            <ul id="categories" >
+            <ul id="categories">
                 <li data-tagid="1">
                     <img src="img/monespacebt2.jpg" />
                 </li>
@@ -47,20 +51,20 @@
                     <img src="img/monespacebt1.jpg" />
                 </li>
             </ul>
-            
+
         </div>
         <div id="filter">
             Filter Length <select id="length-filter">
-    <option value="0" selected>All</option>
-    <option value="15">Short</option>
-    <option value="30">Medium</option>
-    <option value="60">Long</option>
-</select>
+                <option value="0" selected>All</option>
+                <option value="15">Short</option>
+                <option value="30">Medium</option>
+                <option value="60">Long</option>
+            </select>
         </div>
-        
-            <div id="playlists">
 
-            </div>
+        <div id="playlists">
+
+        </div>
     </div>
 </div>
 <script id="playlist-template" type="text/x-handlebars-template">
@@ -68,7 +72,7 @@
     <div data-length="{{time}}" class="playlist">
         <h2>{{time}}</h2>
         <p>
-            <a href="view-playlist.html?tid={{../currentTagId}}&pid={{id}}&iframe=true&width=100%&height=100%" rel="prettyPhoto">
+            <a href="view-playlist.html?tid={{../currentTagId}}&ts={{../timeSlotId}}&wpid={{../wpId}}&pid={{id}}&iframe=true&width=100%&height=100%" rel="prettyPhoto">
                 {{#each units}}
                 {{#unless transition}}
                 {{#if thumbnails.small}}
@@ -83,6 +87,8 @@
     {{/each}}
 </script>
 <script type="text/javascript">
+    var wpId = 710;
+    var timeSlotId = 8;
     $(document).ready(function () {
         $('#categories li').click(function () {
             $('#playlists').html('');
@@ -90,7 +96,7 @@
             var tagId = $(this).data('tagid');
             if (tagId > 0) {
                 $.ajax({
-                    url: "https://vyt.aidn.fr/SimpleSeances/find?wp_id=710&time_slot_id=8&tag_id=" + tagId,
+                    url: "https://vyt.aidn.fr/SimpleSeances/find?wp_id=" + wpId + "&time_slot_id=" + timeSlotId + "&tag_id=" + tagId,
                     data: null,
                     success: function (data, textStatus) {
                         if (textStatus == "success") {
@@ -100,9 +106,11 @@
                             source = $("#playlist-template").html();
                             template = window.Handlebars.compile(source);
                             data.currentTagId = tagId;
+                            data.wpId = wpId;
+                            data.timeSlotId = timeSlotId;
                             html = template(data);
                             $('#playlists').html(html);
-                            $("a[rel^='prettyPhoto']").prettyPhoto({ deeplinking: false});
+                            $("a[rel^='prettyPhoto']").prettyPhoto({ deeplinking: false });
                             //resize parent loader container
                             var height = $("#playlist-container").height();
                             $("#loader").height(height + 20);
@@ -110,7 +118,7 @@
                     }
                 });
             }
-            
+
             return false;
         });
         $('#length-filter').change(function () {

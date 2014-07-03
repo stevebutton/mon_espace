@@ -17,8 +17,9 @@
              position: relative;
              /*padding-bottom: 56.25%;*/
              padding-top: 25px;
-             /*height: 450px;
-             width: 450px;*/
+             height: 455px;
+             width: 500px;
+             width: 100%;
          }
 
         #container iframe {
@@ -55,8 +56,10 @@
         $(document).on("pageshow", "#home", function (event) {
             var tagId = getParameterByName("tid", 0);
             var playListId = getParameterByName("pid", 0);
+            var wpid = getParameterByName("wpid", 0);
+            var timeSlotId = getParameterByName("ts", 0);
             $.mobile.loading('show');
-            var url = "https://vyt.aidn.fr/SimpleSeances/find?wp_id=710&time_slot_id=8&tag_id=" + tagId;
+            var url = "https://vyt.aidn.fr/SimpleSeances/find?wp_id=" + wpid + "&time_slot_id=" + timeSlotId + "&tag_id=" + tagId;
             $.getJSON(url, function (seances) {
                 var list = [];
                 for (var i = 0; i < seances.length; i++) {
