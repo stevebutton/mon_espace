@@ -12,37 +12,41 @@
         #video-details {
             text-align: center;
         }
-         #container {
-             text-align: center;
-             position: relative;
-             padding-bottom: 54.1%;
-             padding-top: 2.2%;
-         }
 
-        #container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        #container {
+            text-align: center;
+            position: relative;
+            padding-bottom: 54.1%;
+            padding-top: 2.2%;
         }
+
+            #container iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
     </style>
 </head>
 <body>
     <div data-role="page" id="home">
-        <!--<div data-role="header">
-            <h1>energie</h1>
-        </div>-->
         <div data-role="content">
+            <!--Vimeo Container-->
             <div id="container">
             </div>
+            <!--End Vimeo Container-->
+            <!--Current video details-->
             <div id="video-details">
                 <h2 id="title"></h2>
                 <p id="description"></p>
             </div>
+            <!--End Current video details-->
+            <!--Playlist Container-->
             <div>
                 <ul data-role="listview" data-inset="true" id="playList"></ul>
             </div>
+            <!--End Playlist Container-->
         </div>
         <div data-role="footer">
         </div>
@@ -51,21 +55,32 @@
         var playlist;
         var currentVideoIndex = 0;
         $(document).on("pageshow", "#home", function (event) {
+            // Get variables from querytring.
             var tagId = getParameterByName("tid", 0);
             var playListId = getParameterByName("pid", 0);
             var wpid = getParameterByName("wpid", 0);
             var timeSlotId = getParameterByName("ts", 0);
+
+            // Show loading animation.
             $.mobile.loading('show');
+
+            // Make request for video playlist.
             var url = "https://vyt.aidn.fr/SimpleSeances/find?wp_id=" + wpid + "&time_slot_id=" + timeSlotId + "&tag_id=" + tagId;
             $.getJSON(url, function (seances) {
                 var list = [];
+                // Cycle through the playlists to get the specified one.
                 for (var i = 0; i < seances.length; i++) {
                     if (seances[i].id == playListId) {
                         playlist = seances[i];
                     }
                 }
+                // Play first video.
                 playVideo(currentVideoIndex);
+
+                // Show video container with animation.
                 $("#container").show('slow');
+
+                // Cycle through the playlist videos and add to the playlist control underneath the current video.
                 for (var i = 0; i < playlist.units.length; i++) {
                     var unit = playlist.units[i];
                     if (!unit.transition) {
@@ -78,15 +93,23 @@
                     }
                 }
                 $("#playList").append(list.join('')).listview('refresh');
+
+                // Hide loading animation.
                 $.mobile.loading('hide');
             });
         });
         function playVideo(index) {
+            // Scroll to top of page
             scroll(0, 0);
             currentVideoIndex = index;
+
+            // Get video to play
             var unit = playlist.units[index];
+
+            // Declare vimeo url for video.
             var vimeoUrl = '//player.vimeo.com/video/' + unit.vimeoid + '?api=1&title=0&byline=0&portrait=0&autoplay=1&player_id=vimeo-player';
 
+            // Check if the Vimeo iframe has already been added, if so simply update the src attribute.
             var iframe = $('#container iframe')[0];
             if (iframe == null) {
                 $("#container").html('<iframe id="vimeo-player" src="' + vimeoUrl + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>').trigger("create");
@@ -95,26 +118,29 @@
                 $('#vimeo-player').attr('src', vimeoUrl);
             }
 
+            // Set video details
             $("#title").text(unit.title);
             $("#description").text(unit.description);
 
+            // Add event to start and finish to play the next video in the sequence.
             var player = $f(iframe);
-
             player.addEvent('ready', function () {
                 player.addEvent('play', videoStart);
                 player.addEvent('finish', videoComplete);
             });
         }
-        
+
         function videoStart(id) {
         }
         function videoComplete(id) {
+            // Increase the current video index and if this is not greater than the total video's play the next one.
             currentVideoIndex++;
             if (currentVideoIndex <= playlist.units.length) {
                 playVideo(currentVideoIndex);
             }
         }
         function getParameterByName(name, defaultValue) {
+            // Get a querystring parameter by name.
             name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
             var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
                 results = regex.exec(location.search);

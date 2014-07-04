@@ -37,6 +37,7 @@
             </a>
         </div>
         <div style="text-align:center;">
+            <!--Start Video Categories, defined by data-tagid attribute-->
             <ul id="categories">
                 <li data-tagid="1">
                     <img src="img/monespacebt2.jpg" />
@@ -51,22 +52,24 @@
                     <img src="img/monespacebt1.jpg" />
                 </li>
             </ul>
-
+            <!--End Start Video Categories-->
         </div>
+        <!--Filter Video Length-->
         <div id="filter">
             Filter Length <select id="length-filter">
-                <option value="0" selected>All</option>
-                <option value="15">Short</option>
-                <option value="30">Medium</option>
-                <option value="60">Long</option>
-            </select>
+                              <option value="0" selected>All</option>
+                              <option value="15">Short</option>
+                              <option value="30">Medium</option>
+                              <option value="60">Long</option>
+                          </select>
         </div>
-
+        <!--End Filter Video Length-->
         <div id="playlists">
 
         </div>
     </div>
 </div>
+<!--Playlist template-->
 <script id="playlist-template" type="text/x-handlebars-template">
     {{#each .}}
     <div data-length="{{time}}" class="playlist">
@@ -86,14 +89,18 @@
 
     {{/each}}
 </script>
+<!--End Playlist template-->
 <script type="text/javascript">
+    // Define variables, WordPressId and TimeSlotId
     var wpId = 710;
     var timeSlotId = 8;
     $(document).ready(function () {
+        // Attach click event to category items to trigger loading of playlists.
         $('#categories li').click(function () {
             $('#playlists').html('');
             $('#length-filter').val('0');
             var tagId = $(this).data('tagid');
+            // If there is a valid tagId request the related videos.
             if (tagId > 0) {
                 $.ajax({
                     url: "https://vyt.aidn.fr/SimpleSeances/find?wp_id=" + wpId + "&time_slot_id=" + timeSlotId + "&tag_id=" + tagId,
@@ -103,6 +110,7 @@
                             var source;
                             var template;
                             var html;
+                            // Bind the returned data to the template and render in the container.
                             source = $("#playlist-template").html();
                             template = window.Handlebars.compile(source);
                             data.currentTagId = tagId;
@@ -110,8 +118,9 @@
                             data.timeSlotId = timeSlotId;
                             html = template(data);
                             $('#playlists').html(html);
+                            // Attach prettyPhoto model popup to playlists
                             $("a[rel^='prettyPhoto']").prettyPhoto({ deeplinking: false });
-                            //resize parent loader container
+                            // Resize parent loader container
                             var height = $("#playlist-container").height();
                             $("#loader").height(height + 20);
                         }
@@ -128,6 +137,7 @@
                 var timeArray = $(this).data('length').split(':');
                 var minutes = parseInt(timeArray[0]) * 60 + parseInt(timeArray[1]);
                 var hide = false;
+                // Check wether video should be hidden for the current filter.
                 if (filter == 15) {
                     if (minutes > 15) {
                         hide = true;
